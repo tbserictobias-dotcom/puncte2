@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Puncte Salvate</title>
+  <style>
+    body {
+      background-color: #0d1117;
+      color: #e6edf3;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      z-index: 1;
+      position: relative;
+    }
+
+    input {
+      font-size: 20px;
+      padding: 8px;
+      width: 200px;
+      text-align: center;
+      border: 2px solid #58a6ff;
+      border-radius: 8px;
+      background: #161b22;
+      color: white;
+      margin-bottom: 10px;
+      z-index: 1;
+      position: relative;
+    }
+
+    table {
+      margin-top: 20px;
+      border-collapse: collapse;
+      width: 200px;
+      background: #161b22;
+      border: 2px solid #30363d;
+      border-radius: 8px;
+      z-index: 1;
+      position: relative;
+    }
+
+    th, td {
+      border: 1px solid #30363d;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #21262d;
+    }
+
+    #congrats {
+      position: absolute;
+      top: 20%; /* mai sus pe ecran */
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 60px;
+      font-weight: bold;
+      color: #ffdf00;
+      text-shadow: 2px 2px #000;
+      display: none;
+      z-index: 2;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: red;
+      z-index: 2;
+      pointer-events: none;
+      animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-10px) rotate(0deg); }
+      100% { transform: translateY(100vh) rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <h1>Puncte</h1>
+
+  <input type="number" id="numberInput" placeholder="Scrie un număr">
+
+  <table id="pointsTable">
+    <thead>
+      <tr><th>Puncte</th></tr>
+    </thead>
+    <tbody>
+      <tr><td id="pointsCell">0</td></tr>
+    </tbody>
+  </table>
+
+  <div id="congrats">Felicitări!</div>
+
+  <script>
+    const input = document.getElementById('numberInput');
+    const pointsCell = document.getElementById('pointsCell');
+    const congrats = document.getElementById('congrats');
+
+    let totalPoints = parseInt(localStorage.getItem('totalPoints')) || 0;
+    pointsCell.textContent = totalPoints;
+
+    let confettiInterval = null;
+
+    function createConfetti() {
+      const confettiColors = ['#ff0a54','#ff477e','#ff7096','#ff85a1','#fbb1b1','#f9bec7','#f7cad0','#fae0e4'];
+      const confetti = document.createElement('div');
+      confetti.classList.add('confetti');
+      confetti.style.backgroundColor = confettiColors[Math.floor(Math.random()*confettiColors.length)];
+      confetti.style.left = Math.random() * window.innerWidth + 'px';
+      confetti.style.animationDuration = (Math.random() * 2 + 3) + 's';
+      confetti.style.width = confetti.style.height = Math.random() * 8 + 5 + 'px';
+      document.body.appendChild(confetti);
+      setTimeout(() => confetti.remove(), 5000);
+    }
+
+    function startConfetti() {
+      if (!confettiInterval) {
+        confettiInterval = setInterval(createConfetti, 100); // creează confetti continuu
+      }
+    }
+
+    function addPoints() {
+      const value = parseInt(input.value);
+      if (!isNaN(value)) { 
+        totalPoints += value;
+        localStorage.setItem('totalPoints', totalPoints);
+        pointsCell.textContent = totalPoints;
+        input.value = '';
+
+        if (totalPoints >= 6261) {
+          congrats.style.display = 'block';
+          startConfetti();
+        }
+      }
+    }
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') addPoints();
+    });
+
+    document.body.addEventListener('click', () => {
+      if (input.value.trim() !== '') addPoints();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'F11') {
+        e.preventDefault();
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(err => console.log(err));
+        } else {
+          document.exitFullscreen();
+        }
+      }
+    });
+  </script>
+</body>
+</html>
